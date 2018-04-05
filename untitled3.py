@@ -2,8 +2,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 import csv
 def read_data():
-    textfile = input("Choose your file: ") # gets text file name
-    myfile = open(textfile) # Opens the file
+    #textfile = input("Choose your file: ") # gets text file name
+    myfile = open("battingData1950Present.csv") # Opens the file
     myfile_csv=csv.reader(myfile) # makes file more readible
     players = [] # List for the students
     for row in myfile_csv:
@@ -29,7 +29,7 @@ def get_menu_choice(players):
         print("10: Extra Credit")
         choice = input('> ')
         if ( choice == "1"):
-            pass
+            hist(unique(players))
         if ( choice == "2"):
             pass
         if ( choice == "3"):
@@ -73,8 +73,7 @@ def hist( Nlist ):
 
 def main():
    playersData=np.array(read_data())
-   hist(unique(playersData))
-   #get_menu_choice(playersData)
+   get_menu_choice(playersData)
 
 
 if __name__=='__main__':
