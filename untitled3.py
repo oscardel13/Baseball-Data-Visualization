@@ -71,6 +71,22 @@ def hist( Nlist ):
     plt.title('Total runs vs number of players having that many runs')
     plt.hist(Nlist.astype(int), bins = 100, stacked = True)
     plt.show()
+    
+def PositionList(list):
+    playerID = []
+    runs = []
+    for row in list:
+        playerID.append(row[0])
+        runs.append(row[1])
+    NplayerID = np.array(playerID)
+    Nruns = np.array(runs)
+    unique_players = np.unique(NplayerID)
+    sums = []
+    for group in unique_players:
+        sums.append(Nruns[NplayerID == group].astype(int).sum())
+    Nsums = np.array(sums)
+    return Nsums
+
 def UniquePostions(players):
     sums1B = []
     sums2B = []
