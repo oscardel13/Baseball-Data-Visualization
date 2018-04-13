@@ -120,6 +120,7 @@ def postitionHist(Nlist):
     plt.title('Total runs vs number of players having that many runs')
     plt.hist(Nlist, bins = 100, stacked = True, label=["1B","2B","3B","C","NULL","OF","P","SS"])
     plt.legend()
+    plt.savefig("positionHist")
     plt.show()
     
 def cutoffHist(Nlist,cut1,cut2):
@@ -128,6 +129,7 @@ def cutoffHist(Nlist,cut1,cut2):
     plt.title('Total runs vs number of players having that many runs')
     plt.hist(Nlist, bins = 100, stacked = True, range=(cut1,cut2),label=["1B","2B","3B","C","NULL","OF","P","SS"])
     plt.legend()
+    plt.savefig("cutoffHist.pdf")
     plt.show()
 
 def teamPresence(Nlist):
