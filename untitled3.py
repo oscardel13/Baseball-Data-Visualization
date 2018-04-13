@@ -70,6 +70,7 @@ def hist( Nlist ):
     plt.ylabel('Number of players')
     plt.title('Total runs vs number of players having that many runs')
     plt.hist(Nlist.astype(int), bins = 100, stacked = True)
+    plt.savefig("Hist.pdf")
     plt.show()
     
 def PositionList(list):
