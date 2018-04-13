@@ -31,11 +31,12 @@ def get_menu_choice(players):
         if ( choice == "1"):
             hist(unique(players))
         if ( choice == "2"):
-            pass
+        if ( choice == "2"):
+            postitionHist(UniquePostions(players))
         if ( choice == "3"):
-            pass
+            cutoffHist(UniquePostions(players),100,3000)
         if ( choice == "4"):
-            pass
+            scat(teamPresence(players))
         if ( choice == "5"):
             pass
         if ( choice == "6"):
@@ -70,7 +71,63 @@ def hist( Nlist ):
     plt.title('Total runs vs number of players having that many runs')
     plt.hist(Nlist.astype(int), bins = 100, stacked = True)
     plt.show()
+def UniquePostions(players):
+    sums1B = []
+    sums2B = []
+    sums3B = []
+    sumsC = []
+    sumsNULL = []
+    sumsOF = []
+    sumsP = []
+    sumsSS = []
+    for row in players:
+        if (row[19] == "1B"):
+            sums1B.append([row[1],row[7]])
+        if (row[19] == "2B"):
+            sums2B.append([row[1],row[7]])
+        if (row[19] == "3B"):
+            sums3B.append([row[1],row[7]])
+        if (row[19] == "C"):
+            sumsC.append([row[1],row[7]])
+        if (row[19] == "NULL"):
+            sumsNULL.append([row[1],row[7]])
+        if (row[19] == "OF"):
+            sumsOF.append([row[1],row[7]])
+        if (row[19] == "P"):
+            sumsP.append([row[1],row[7]])
+        if (row[19] == "SS"):
+            sumsSS.append([row[1],row[7]])
+    return np.array([PositionList(np.array(sums1B)),PositionList(np.array(sums2B)),PositionList(np.array(sums3B)),PositionList(np.array(sumsC)),PositionList(np.array(sumsNULL)),PositionList(np.array(sumsOF)),PositionList(np.array(sumsP)),PositionList(np.array(sumsSS))])
+def postitionHist(Nlist):
+    plt.xlabel('Number of total runs')
+    plt.ylabel('Number of players')
+    plt.title('Total runs vs number of players having that many runs')
+    plt.hist(Nlist, bins = 100, stacked = True, label=["1B","2B","3B","C","NULL","OF","P","SS"])
+    plt.legend()
+    plt.show()
+    
+def cutoffHist(Nlist,cut1,cut2):
+    plt.xlabel('Number of total runs')
+    plt.ylabel('Number of players')
+    plt.title('Total runs vs number of players having that many runs')
+    plt.hist(Nlist, bins = 100, stacked = True, range=(cut1,cut2),label=["1B","2B","3B","C","NULL","OF","P","SS"])
+    plt.legend()
+    plt.show()
 
+def teamPresence(Nlist):
+    tmpYear = Nlist[0][0]
+    team = []
+    year = []
+    for row in Nlist:
+        team.append(row[4])
+        year.append(row[0])
+    teamList = np.array([np.array(team),np.array(year)])
+    return np.unique(teamList,axis=0)
+            
+def scat(Nlist):
+    plt.scatter(Nlist[0],Nlist[1])
+    plt.show()
+    
 def main():
    playersData=np.array(read_data())
    get_menu_choice(playersData)
