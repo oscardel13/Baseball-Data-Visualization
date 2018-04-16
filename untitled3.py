@@ -1,19 +1,45 @@
 import numpy as np
 from matplotlib import pyplot as plt
 import csv
+class BattingData:    
+    year = 0
+    player_id = 1
+    first_name = 2
+    last_name= 3
+    team_name= 4
+    games = 5
+    at_bats =6
+    runs = 7
+    hits = 8
+    doubles =9
+    triples =10
+    home_runs=11
+    rbi = 12
+    walks = 13
+    hbp = 14
+    stolen_bases = 15 
+    caught_stealing = 16 
+    strike_outs = 17 
+    sac_flies = 18 
+    position = 19
+
 def read_data():
     #textfile = input("Choose your file: ") # gets text file name
     myfile = open("battingData1950Present.csv") # Opens the file
     myfile_csv=csv.reader(myfile) # makes file more readible
     players = [] # List for the students
     for row in myfile_csv:
-        players.append(row) # Adds the list of the student into another list
+        if row[BattingData.sac_flies] == '':
+            row[BattingData.sac_flies] = 0
+            #print("anything")
+        players.append(row)
+        # Adds the list of the student into another list
     #players.sort(key=lambda x: (x[0],x[1])) # Alphabetize the list by last name then firstname
     del players[0]
     myfile.close() # Closes the file
     return players
-
-def get_menu_choice(players):
+# This function is the UI that the user can pick the program they want to run
+def get_menu_choice(PlayersData):
     choice = "100"
     while (choice!="0"):
         print("0: Exit")
@@ -22,33 +48,33 @@ def get_menu_choice(players):
         print("3: Histogram of runs scored in the lifetimes of all players (cutoff = 100)")
         print("4: Graph team presence over time")
         print("5: Find the batters that had the best and worst seasons stealing bases")
-        print("6: List the 10 best seasons that batters had by on base percentage")
+        print("6: List the 20 best seasons that batters had by on base percentage")
         print("7: Plot on base percentage for the lifetimes of players with best seasons")
         print("8: Plot homeruns over time (percentiles)")
         print("9: Plot average team RBI over time (1950 - 1959)")
         print("10: Extra Credit")
         choice = input('> ')
         if ( choice == "1"):
-            uniqueHist(unique(players))
+            uniqueHist(unique(PlayersData))
         if ( choice == "2"):
-            postitionHist(UniquePostions(players,1))
+            postitionHist(UniquePostions(PlayersData,1))
         if ( choice == "3"):
-            postitionHist(UniquePostions(players,2))
+            postitionHist(UniquePostions(PlayersData,2))
         if ( choice == "4"):
-            scat(teamPresence(players))
+            scat(teamPresence(PlayersData))
         if ( choice == "5"):
             pass
         if ( choice == "6"):
             pass
         if ( choice == "7"):
-            pass
+            you_gonna_need_this= twenty_best_seasons(PlayersData)
         if ( choice == "8"):
             pass
         if ( choice == "9"):
             pass
         if ( choice == "10"):
             pass
-
+# This function makes an array of players and runs
 def unique(players):
     playerID = []
     runs = []
@@ -63,7 +89,7 @@ def unique(players):
         sums.append(Nruns[NplayerID == group].astype(int).sum())
     Nsums = np.array(sums)
     return Nsums
-
+# this function plots the histogram for 3b.
 def uniqueHist( Nlist ):
     plt.xlabel('Number of total runs')
     plt.ylabel('Number of players')
@@ -150,7 +176,6 @@ def cutoffHist(Nlist,cut1,cut2):
     plt.show()
 
 def teamPresence(Nlist):
-    tmpYear = Nlist[0][0]
     team = []
     year = []
     for row in Nlist:
@@ -183,11 +208,28 @@ def scat(Nlist):
 
     plt.show()
     
-
+def twenty_best_seasons(PlayersData):
+    at_bats= np.percentile(PlayersData[:, BattingData.at_bats].astype(np.int32), 25)
+    games_played= np.percentile(PlayersData[:, BattingData.games].astype(np.int32), 25)
+    intersections=PlayersData[np.where(np.logical_and(PlayersData[:,BattingData.at_bats].astype(np.int32)>at_bats,(PlayersData[:,BattingData.games].astype(np.int32)>games_played)))]
+    hitss=(intersections[:, BattingData.hits].astype(np.int32))
+    walkss=(intersections[:,BattingData.walks].astype(np.int32))
+    hit_by_pitch= (intersections[:, BattingData.hbp].astype(np.int32)) 
+    at_batss= (intersections[:, BattingData.at_bats].astype(np.int32))
+    sacrifice_flies= (intersections[:, BattingData.sac_flies].astype(np.int32))
+    final_percentage=((hitss+walkss+hit_by_pitch)/(at_batss+walkss+hit_by_pitch+sacrifice_flies))
+    best_stats = np.argpartition(final_percentage, 20)[-20:]
+    print(best_stats)
+    
+    #print(final_percentage)
+    #print(at_bats)
+    #print(games_played)
+    
+    
 
 def main():
-   playersData=np.array(read_data())
-   get_menu_choice(playersData)
+   PlayersData=np.array(read_data(),dtype=np.str)
+   get_menu_choice(PlayersData)
    
 if __name__=='__main__':
     main()
