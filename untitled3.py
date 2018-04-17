@@ -63,11 +63,11 @@ def get_menu_choice(PlayersData):
         if ( choice == "4"):
             scat(teamPresence(PlayersData))
         if ( choice == "5"):
-            pass
+            best_worst_steals(PlayersData)
         if ( choice == "6"):
-            pass
+           you_gonna_need_this= twenty_best_seasons(PlayersData)
         if ( choice == "7"):
-            you_gonna_need_this= twenty_best_seasons(PlayersData)
+            obp_for_20_best_seasons(PlayersData)
         if ( choice == "8"):
             pass
         if ( choice == "9"):
@@ -211,16 +211,81 @@ def scat(Nlist):
 def twenty_best_seasons(PlayersData):
     at_bats= np.percentile(PlayersData[:, BattingData.at_bats].astype(np.int32), 25)
     games_played= np.percentile(PlayersData[:, BattingData.games].astype(np.int32), 25)
-    intersections=PlayersData[np.where(np.logical_and(PlayersData[:,BattingData.at_bats].astype(np.int32)>at_bats,(PlayersData[:,BattingData.games].astype(np.int32)>games_played)))]
+    intersections=PlayersData[np.where(np.logical_and((PlayersData[:,BattingData.at_bats].astype(np.int32)>at_bats),(PlayersData[:,BattingData.games].astype(np.int32)>games_played)))]
     hitss=(intersections[:, BattingData.hits].astype(np.int32))
     walkss=(intersections[:,BattingData.walks].astype(np.int32))
     hit_by_pitch= (intersections[:, BattingData.hbp].astype(np.int32)) 
     at_batss= (intersections[:, BattingData.at_bats].astype(np.int32))
     sacrifice_flies= (intersections[:, BattingData.sac_flies].astype(np.int32))
     final_percentage=((hitss+walkss+hit_by_pitch)/(at_batss+walkss+hit_by_pitch+sacrifice_flies))
-    best_stats = np.argpartition(final_percentage, 20)[-20:]
-    print(best_stats)
+    best_stats = np.argpartition(final_percentage, -20)[-20:]
+    print(intersections[best_stats])
     
+def best__and_worst_steals(player_data):
+    percentile = np.percentile(player_data[:,BattingData.games].astype(int),25) 
+    array_of_games = player_data[:,BattingData.games].astype(int)
+    arr = player_data[np.where(array_of_games > percentile)]
+    stolenbase = arr[:,BattingData.stolen_bases].astype(int)
+    games = arr[:,BattingData.games].astype(int)
+    caught_stealing = arr[:,BattingData.caught_stealing].astype(int)
+    ratio_of_steals = (stolenbase/games)
+    failed_to_steal = caught_stealing - stolenbase
+
+   
+    best_index = np.argmax(ratio_of_steals)
+    print("The best base stealer is: ")
+    print(arr[best_index])
+    worst_index = np.argmax(failed_to_steal)
+    print("The worst base stealer is: ")
+    print(arr[worst_index])        
+    
+def obp_for_20_best_seasons(PlayersData):
+    at_bats= np.percentile(PlayersData[:, BattingData.at_bats].astype(np.int32), 25)
+    games_played= np.percentile(PlayersData[:, BattingData.games].astype(np.int32), 25)
+    intersections=PlayersData[np.where(np.logical_and((PlayersData[:,BattingData.at_bats].astype(np.int32)>at_bats),(PlayersData[:,BattingData.games].astype(np.int32)>games_played)))]
+    at_batss= (intersections[:, BattingData.at_bats].astype(np.int32))
+    intersections=PlayersData[np.where(np.logical_and((PlayersData[:,BattingData.at_bats].astype(np.int32)>at_bats),(PlayersData[:,BattingData.games].astype(np.int32)>games_played)))]
+    hitss=(intersections[:, BattingData.hits].astype(np.int32))
+    walkss=(intersections[:,BattingData.walks].astype(np.int32))
+    hit_by_pitch= (intersections[:, BattingData.hbp].astype(np.int32)) 
+    at_batss= (intersections[:, BattingData.at_bats].astype(np.int32))
+    sacrifice_flies= (intersections[:, BattingData.sac_flies].astype(np.int32))
+    final_percentage=((hitss+walkss+hit_by_pitch)/(at_batss+walkss+hit_by_pitch+sacrifice_flies))
+    best_stats = np.argpartition(final_percentage, -20)[-20:]
+    total=(intersections[best_stats])
+    name=np.unique(total[:,BattingData.player_id])
+    last_namex= np.unique(total[:, BattingData.last_name])
+    first_namex= np.unique(total[:, BattingData.first_name])
+    
+    final_name= []
+    for i in range(10):
+        final_name.append(first_namex[i]+ ","+ last_namex[i])
+        
+    #final_name.append(last_namex+","+first_namex)
+
+    for i in name:
+        indicies = np.where(PlayersData[:, BattingData.player_id] == i)
+        temp = PlayersData[indicies]
+        player_rows=PlayersData[indicies,:][0]
+        unique_years_rows= np.unique(player_rows[:,BattingData.year])
+        on_base_percentage= []
+        years= []
+        for j in np.sort(unique_years_rows):
+            indicies = np.where(player_rows[:, BattingData.year].astype(np.int32) == int(j))
+            rows = player_rows[indicies, :][0]
+            hitssx=np.sum(rows[:, BattingData.hits].astype(np.int32))
+            walkssx=np.sum(rows[:,BattingData.walks].astype(np.int32))
+            hit_by_pitchx= np.sum(rows[:, BattingData.hbp].astype(np.int32)) 
+            at_batssx= np.sum(rows[:, BattingData.at_bats].astype(np.int32))
+            sacrifice_fliesx= np.sum(rows[:, BattingData.sac_flies].astype(np.int32))
+            on_base_percentage.append((hitssx + walkssx + hit_by_pitchx)/(at_batssx + hit_by_pitchx + walkssx + sacrifice_fliesx))
+            years.append(int(j))
+        plt.plot(years, on_base_percentage, label= temp[0, BattingData.first_name]+" " +temp[0, BattingData.last_name])
+
+
+    #plt.legend(final_name)
+    plt.legend(loc="center left", bbox_to_anchor=(1, 0.5))
+    plt.show()
     #print(final_percentage)
     #print(at_bats)
     #print(games_played)
